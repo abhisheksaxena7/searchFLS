@@ -59,7 +59,8 @@ export default class Org extends SfdxCommand {
       }
       return this.ux.warn(messages.getMessage('noCustomField'));
     } catch (error) {
-      if (error.message === messages.getMessage('pkgNotFound')) return this.ux.warn('Package is empty, skipping execution');
+      if (error.message === messages.getMessage('pkgNotFound'))
+        return this.ux.warn('Package is empty, skipping execution');
       throw error;
     }
 

@@ -6,6 +6,6 @@
   "pkgNotFound": "ENOENT: no such file or directory, open 'package/mdapi/package.xml'",
   "noCustomField": "Custom Fields are not part of the package.xml skipping execution",
   "examples": [
-    "sfdx search:fls --manifest mdapi/package.xml --profile force-app/main/default/Admin.profile"
+    "sfdx search:fls --manifest mdapi/package.xml --profile force-app/main/default/profiles/Admin.profile"
   ]
 }

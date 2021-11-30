@@ -10,7 +10,9 @@
     "@oclif/errors": "^1",
     "@salesforce/command": "^3",
     "@salesforce/core": "^2",
-    "tslib": "^2"
+    "colors": "^1.4.0",
+    "tslib": "^2",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1",

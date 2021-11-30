@@ -1,10 +1,11 @@
 {
-  "commandDescription": "print a greeting and your org IDs",
-  "nameFlagDescription": "name to print",
-  "forceFlagDescription": "example boolean flag",
-  "errorNoOrgResults": "No results found for the org '%s'.",
+  "commandDescription": "Search for FLS of CustomFields mentioned in the passed package.xml in the profiles that're passed to this command",
+  "manifestFlagDescription": "file path for manifest (package.xml)",
+  "profileFlagDescription": "file path for the profile",
+  "NoFLSFound": "The following fields do not have read permissions on the Admin profile. Update Admin profile to give them access. '%s'.",
+  "pkgNotFound": "ENOENT: no such file or directory, open 'package/mdapi/package.xml'",
+  "noCustomField": "Custom Fields are not part of the package.xml skipping execution",
   "examples": [
-    "sfdx hello:org --targetusername myOrg@example.com --targetdevhubusername devhub@org.com",
-    "sfdx hello:org --name myname --targetusername myOrg@example.com"
+    "sfdx search:fls --manifest mdapi/package.xml --profile force-app/main/default/Admin.profile"
   ]
 }

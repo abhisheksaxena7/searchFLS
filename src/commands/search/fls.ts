@@ -9,9 +9,7 @@ import { promises as fs } from 'fs';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, SfdxError } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { parseString } from 'xml2js';
-import * as colors from 'colors';
-
+import * as fls from '../../main';
 // Initialize Messages with the current plugin directory
 Messages.importMessagesDirectory(__dirname);
 
@@ -47,63 +45,21 @@ export default class Org extends SfdxCommand {
   public async run(): Promise<AnyJson> {
     const manifest = this.flags.manifest as string;
     const profile = this.flags.profile as string;
+    const output = {
+      error: null,
+      success: true,
+      warnings: [],
+    }
     try {
-      const packageXML = (await fs.readFile(manifest)).toString();
-      // this.ux.log('Manifest file', packageXML);
-      const customFieldIndex = packageXML.search('CustomField');
-      // If Custom fields are present in the package.xml
-      if (customFieldIndex !== -1) {
-        this.returnCustomFieldsArray(packageXML);
-        this.ux.log(customFieldsArray.toString());
-        return await this.verifyPermissionsInAdminProfile(profile);
-      }
-      return this.ux.warn(messages.getMessage('noCustomField'));
-    } catch (error) {
-      if (error.message === messages.getMessage('pkgNotFound'))
-        return this.ux.warn('Package is empty, skipping execution');
-      throw error;
+      const jobResult = fls({ manifest, profile });
+      output.warnings = jobResult?.warnings?.map(warning => warning.message)
+    } catch (err) {
+      output.success = false
+      output.error = err.message
+      process.exitCode = 1
     }
 
-    // Return an object to be displayed with --json
-    // return { orgId: this.org.getOrgId(), outputString };
-    return {};
+    this.ux.log(JSON.stringify(output, null, 2))
+    return null
   }
-
-  /**
-   * This method parses the package.xml as Javascript Object,
-   * finds the customFields in it, puts them in an array and returns the array
-   *
-   * @param {String} packageXML - The content of package.xml
-   * @returns The array of CustomFields in the package.xml
-   */
-  protected returnCustomFieldsArray = (packageXML: string): string[] => {
-    return parseString(packageXML, (err, packageXMLObj: string) => {
-      customFieldsArray = packageXMLObj.Package.types.filter(
-        (element: { name: string[] }) => element.name[0] === 'CustomField'
-      )[0].members as string[];
-      return customFieldsArray;
-    }) as string[];
-    return customFieldsArray;
-  };
-
-  protected verifyPermissionsInAdminProfile = async (profile: string): Promise<void> => {
-    const fieldsWithoutReadAccess = [];
-    const adminProfile = (await fs.readFile(profile)).toString();
-    parseString(adminProfile, (err, adminProfileObj: string) => {
-      customFieldsArray.forEach((customField) => {
-        const fieldPermissionBlock = adminProfileObj
-          .Profile.fieldPermissions.find((obj) => obj.field[0] === customField);
-        if (!fieldPermissionBlock || !fieldPermissionBlock.readable || fieldPermissionBlock.readable[0] === 'false') {
-          fieldsWithoutReadAccess.push(customField);
-        }
-        return fieldsWithoutReadAccess;
-      });
-    });
-    if (fieldsWithoutReadAccess.length > 0) {
-      throw new SfdxError(messages.getMessage('NoFLSFound', [fieldsWithoutReadAccess.toString()]));
-    }
-    return this.ux.log(
-      colors.green('All customFields getting mentioned in this package have permission in the Admin profile.')
-    );
-  };
 }

@@ -1,8 +1,15 @@
 {
   "extends": "@salesforce/dev-config/tsconfig",
   "compilerOptions": {
+    "allowJs": true,
     "outDir": "lib",
-    "rootDir": "src"
+    "rootDir": "src",
+    "declaration": true,
+    "importHelpers": true,
+    "resolveJsonModule": true,
   },
-  "include": ["./src/**/*.ts"]
+  "include": [
+    "./src/**/*",
+    "./src/**/*.json"
+  ]
 }
